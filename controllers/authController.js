@@ -12,31 +12,28 @@ const multer = require('multer');
 const path = require('path');
 
 // Register user
-exports.registerUser = async (req, res) => {
+const registerUser = async (req, res) => {
   try {
     const { username, email, password } = req.body;
-    const user = await User.findOne({ $or: [{ email }, { username }] });
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
 
-    if (user) {
-      return res.status(400).json({ message: 'User already exists' });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new User({
+    const user = new User({
       username,
       email,
       password: hashedPassword,
     });
 
-    await newUser.save();
+    await user.save();
     res.status(201).json({ message: 'User registered successfully' });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    console.error('Error registering user:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
 // Login user (updated to support both users and admins)
-exports.loginUser = async (req, res) => {
+const loginUser = async (req, res) => {
   const { username, password } = req.body;
 
   try {
@@ -104,29 +101,33 @@ exports.loginUser = async (req, res) => {
 };
 
 // Get user profile
-exports.getProfile = async (req, res) => {
+const getProfile = async (req, res) => {
   try {
-    const userId = req.user.userId;
+    console.log('Fetching user profile for user ID:', req.user._id);
 
-    // Fetch user profile
-    const user = await User.findById(userId).select('-password');
+    const user = await User.findById(req.user._id)
+      .populate('bookings')
+      .populate('reviews');
 
-    // Fetch user's bookings with vehicle details
-    const bookings = await Booking.find({ user: userId }).populate('vehicle', 'name model');
+    if (!user) {
+      console.log('User not found');
+      return res.status(404).json({ message: 'User not found' });
+    }
 
-    // Fetch user's payments
-    const payments = await Payment.find({ user: userId });
-
-    // Fetch user's reviews with vehicle details
-    const reviews = await Review.find({ user: userId }).populate('vehicle', 'name model');
+    console.log('Populated bookings:', user.bookings);
+    console.log('Populated reviews:', user.reviews);
 
     res.json({
-      profile: user,
-      bookings: bookings,
-      payments: payments,
-      reviews: reviews
+      profile: {
+        username: user.username,
+        email: user.email,
+        imageUrl: user.imageUrl,
+        bookings: user.bookings,
+        reviews: user.reviews
+      },
     });
   } catch (error) {
+    console.error('Error fetching profile:', error.message);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
@@ -144,7 +145,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 // Update user profile
-exports.updateUserProfile = async (req, res) => {
+const updateUserProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user.userId);
 
@@ -171,7 +172,7 @@ exports.updateUserProfile = async (req, res) => {
 };
 
 // Request password reset
-exports.requestPasswordReset = async (req, res) => {
+const requestPasswordReset = async (req, res) => {
   const { email } = req.body;
   try {
     const user = await User.findOne({ email });
@@ -211,7 +212,7 @@ exports.requestPasswordReset = async (req, res) => {
 };
 
 // Reset Password
-exports.resetPassword = async (req, res) => {
+const resetPassword = async (req, res) => {
   const { token, newPassword } = req.body;
   try {
     const user = await User.findOne({ resetToken: token, resetTokenExpiration: { $gt: Date.now() } });
@@ -228,4 +229,13 @@ exports.resetPassword = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
+};
+
+module.exports = {
+  registerUser,
+  loginUser,
+  getProfile,
+  updateUserProfile,
+  requestPasswordReset,
+  resetPassword
 };

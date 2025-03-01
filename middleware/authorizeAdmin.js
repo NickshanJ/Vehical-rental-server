@@ -1,26 +1,24 @@
 const User = require('../models/User');
-const Admin = require('../models/Admin'); // Import the Admin model
+const Admin = require('../models/Admin');
 
 const authorizeAdmin = async (req, res, next) => {
   try {
-    console.log('authorizeAdmin: Checking admin status for user ID:', req.user.userId);
+    console.log('authorizeAdmin: Checking admin status for user ID:', req.user._id);
 
-    // Check if the user is an admin in the `admins` collection
-    const admin = await Admin.findById(req.user.userId);
+    const admin = await Admin.findById(req.user._id);
     if (admin) {
       console.log('authorizeAdmin: Admin found in the `admins` collection:', admin);
-      req.user.isAdmin = true; // Ensure isAdmin is set to true
+      req.user.isAdmin = true;
       next();
       return;
     }
 
     console.log('authorizeAdmin: Admin not found in the `admins` collection, checking `users` collection');
     
-    // Check if the user is an admin in the `users` collection
-    const user = await User.findById(req.user.userId);
+    const user = await User.findById(req.user._id);
     if (user && user.isAdmin) {
       console.log('authorizeAdmin: Admin found in the `users` collection:', user);
-      req.user.isAdmin = true; // Ensure isAdmin is set to true
+      req.user.isAdmin = true;
       next();
       return;
     }
