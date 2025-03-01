@@ -24,7 +24,10 @@ const app = express();
 // Middleware
 app.use(bodyParser.json());
 const corsOptions = {
-  origin: ['http://localhost:5173'], // Replace with your actual frontend domain in production
+  origin: [
+    'http://localhost:5173', // Local development
+    'https://online-vehicle-rental.netlify.app' // Production frontend
+  ],
   credentials: true,
 };
 app.use(cors(corsOptions));
