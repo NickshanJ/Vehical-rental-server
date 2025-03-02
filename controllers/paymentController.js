@@ -32,7 +32,7 @@ exports.getPaymentById = async (req, res) => {
 // Handle Stripe checkout session creation
 exports.createCheckoutSession = async (req, res) => {
   try {
-    const frontendUrl = 'https://online-vehicle-rental.netlify.app'; // Replace with your actual frontend URL
+    const frontendUrl = 'http://localhost:5173'; // Replace with your actual frontend URL
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -47,8 +47,8 @@ exports.createCheckoutSession = async (req, res) => {
         },
       ],
       mode: 'payment',
-      success_url: `https://online-vehicle-rental.netlify.app/thank-you`, // Redirect to ThankYouPage
-      cancel_url: `https://online-vehicle-rental.netlify.app/checkout-cancelled`, // Redirect to a cancellation page
+      success_url: `${frontendUrl}/thank-you`, // Redirect to ThankYouPage
+      cancel_url: `${frontendUrl}/checkout-cancelled`, // Redirect to a cancellation page
     });
 
     res.status(200).json({ url: session.url });
