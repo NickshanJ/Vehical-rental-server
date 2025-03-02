@@ -23,6 +23,7 @@ const app = express();
 
 // Middleware
 app.use(bodyParser.json());
+app.use(bodyParser.raw({ type: 'application/json' }));
 const corsOptions = {
   origin: [
     'http://localhost:5173',
@@ -57,7 +58,7 @@ app.use('/api/rental-history', rentalHistoryRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/admin', supportQueriesRoutes);
-app.use('/api', stripeWebhook);
+app.use('/api/webhook', stripeWebhook);
 
 // Serve static files
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));

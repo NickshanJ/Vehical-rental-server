@@ -13,6 +13,7 @@ const path = require('path');
 router.post('/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
   const sig = req.headers['stripe-signature'];
   let event;
+
   try {
     event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
   } catch (err) {
@@ -100,6 +101,36 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
       }
 
       break;
+
+    case 'checkout.session.completed':
+      const session = event.data.object;
+
+      // Handle payment success
+      try {
+        const booking = await Booking.findByIdAndUpdate(
+          session.metadata.bookingId,
+          { status: 'completed' },
+          { new: true }
+        ).populate('user vehicle');
+
+        if (!booking) {
+          return res.status(404).json({ message: 'Booking not found.' });
+        }
+
+        // Prepare email details
+        const emailSubject = 'Payment Confirmation';
+        const emailText = `Thank you for your payment. Your payment details are: ${JSON.stringify(session)}`;
+
+        // Send confirmation email
+        await sendEmail(booking.user.email, emailSubject, emailText);
+
+        console.log(`Payment succeeded for booking ID: ${booking._id}`);
+      } catch (error) {
+        console.error('Error handling payment success:', error.message);
+      }
+
+      break;
+
     default:
       console.log(`Unhandled event type ${event.type}`);
   }
