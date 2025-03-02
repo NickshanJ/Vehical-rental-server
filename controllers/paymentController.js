@@ -58,6 +58,29 @@ exports.createCheckoutSession = async (req, res) => {
   }
 };
 
+// Handle webhook
+exports.handleWebhook = (req, res) => {
+  const sig = req.headers['stripe-signature'];
+
+  let event;
+  try {
+    event = stripe.webhooks.constructEvent(req.rawBody, sig, process.env.STRIPE_WEBHOOK_SECRET);
+  } catch (err) {
+    console.error('Webhook signature verification failed:', err.message);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+
+  if (event.type === 'checkout.session.completed') {
+    const session = event.data.object;
+
+    // Call handlePaymentSuccess function manually (if still needed)
+    handlePaymentSuccess({ body: { sessionId: session.id } }, res);
+  } else {
+    res.sendStatus(400);
+  }
+  res.status(200).json({ received: true });
+};
+
 // Create a new payment
 exports.createPayment = async (req, res) => {
   try {
