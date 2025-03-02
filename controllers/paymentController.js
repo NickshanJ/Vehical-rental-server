@@ -58,53 +58,6 @@ exports.createCheckoutSession = async (req, res) => {
   }
 };
 
-// Handle payment success
-exports.handlePaymentSuccess = async (req, res) => {
-  try {
-    const { sessionId } = req.body;
-    console.log('Received sessionId:', sessionId);
-    const session = await stripe.checkout.sessions.retrieve(sessionId);
-    console.log('Retrieved session:', session);
-
-    if (session.payment_status === 'paid') {
-      const booking = await Booking.findByIdAndUpdate(
-        session.metadata.bookingId,
-        { status: 'completed' },
-        { new: true }
-      ).populate('user vehicle');
-      console.log('Booking found:', booking);
-
-      if (!booking) {
-        return res.status(404).json({ message: 'Booking not found.' });
-      }
-
-      // Prepare email details
-      const emailSubject = 'Payment Confirmation';
-      const emailText = `Thank you for your payment. Your payment details are: ${JSON.stringify(session)}`;
-
-      console.log('Preparing to send email to:', booking.user.email);
-
-      // Send confirmation email
-      try {
-        await sendEmail(booking.user.email, emailSubject, emailText);
-        console.log('Email sent successfully');
-      } catch (emailError) {
-        console.error('Error sending email:', emailError);
-        return res.status(500).json({ message: 'Error sending email', error: emailError.message });
-      }
-
-      console.log(`Payment succeeded for booking ID: ${booking._id}`);
-      return res.status(200).json({ message: 'Payment processed successfully!' });
-    } else {
-      console.log('Payment not completed.');
-      return res.status(400).json({ message: 'Payment not completed.' });
-    }
-  } catch (error) {
-    console.error('Error handling payment success:', error.message);
-    res.status(500).json({ message: 'Server error', error: error.message });
-  }
-};
-
 // Create a new payment
 exports.createPayment = async (req, res) => {
   try {
