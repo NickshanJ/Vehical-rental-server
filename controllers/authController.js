@@ -199,7 +199,7 @@ const requestPasswordReset = async (req, res) => {
       from: process.env.EMAIL_USER,
       to: email,
       subject: 'Password Reset Request',
-      text: `You requested a password reset. Click the link below to reset your password:\n\nhttp://localhost:5173/reset-password/${resetToken}`, // Update URL to point to port 5173
+      text: `You requested a password reset. Click the link below to reset your password:\n\n${process.env.CLIENT_URL}/reset-password/${resetToken}`, // Correctly use the CLIENT_URL from .env
     };
 
     await transporter.sendMail(mailOptions);
