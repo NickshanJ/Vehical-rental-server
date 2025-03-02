@@ -1,15 +1,3 @@
-const express = require('express');
-const router = express.Router();
-const dotenv = require('dotenv');
-dotenv.config();
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-const Booking = require('../models/Booking');
-const RentalHistory = require('../models/RentalHistory');
-const sendEmail = require('../utils/emailService');
-const generateInvoice = require('../utils/invoiceService');
-const fs = require('fs');
-const path = require('path');
-
 router.post('/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
   const sig = req.headers['stripe-signature'];
   let event;
