@@ -100,7 +100,7 @@ const handlePaymentIntentSucceeded = async (paymentIntent) => {
       Thank you for choosing our service!
     `;
 
-    console.log('Sending email to:', populatedBooking.user.email);
+    console.log('Preparing to send email to:', populatedBooking.user.email);
     await sendEmail(
       populatedBooking.user.email,
       'Booking Confirmation and Invoice',
@@ -135,7 +135,7 @@ const handleCheckoutSessionCompleted = async (session) => {
     const emailSubject = 'Payment Confirmation';
     const emailText = `Thank you for your payment. Your payment details are: ${JSON.stringify(session)}`;
 
-    console.log('Sending email to:', booking.user.email);
+    console.log('Preparing to send email to:', booking.user.email);
     await sendEmail(booking.user.email, emailSubject, emailText);
     console.log(`Email sent successfully to ${booking.user.email}`);
   } catch (error) {
