@@ -50,7 +50,7 @@ app.use('/api/auth', authRoutes); // Ensure this route is correct
 app.use('/api/vehicles', vehicleRoutes);
 app.use('/api/booking', bookingRoutes);
 app.use('/api/users', userRoutes);
-app.use('/api/payment', paymentRoutes);
+app.use('/api/payments', paymentRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/support', supportRoutes);
 app.use('/api/rental-history', rentalHistoryRoutes);

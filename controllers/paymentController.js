@@ -32,7 +32,7 @@ exports.getPaymentById = async (req, res) => {
 // Handle Stripe checkout session creation
 exports.createCheckoutSession = async (req, res) => {
   try {
-    const frontendUrl = 'https://online-vehicle-rental.netlify.app'; // Replace with your actual frontend URL
+    const frontendUrl = 'https://online-vehicle-rental.netlify.app';
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -41,14 +41,14 @@ exports.createCheckoutSession = async (req, res) => {
           price_data: {
             currency: 'usd',
             product_data: { name: 'Vehicle Rental Payment' },
-            unit_amount: req.body.totalAmount * 100, // Convert to cents
+            unit_amount: req.body.totalAmount * 100, 
           },
           quantity: 1,
         },
       ],
       mode: 'payment',
-      success_url: `${frontendUrl}/thank-you`, // Redirect to ThankYouPage
-      cancel_url: `${frontendUrl}/checkout-cancelled`, // Redirect to a cancellation page
+      success_url: `${frontendUrl}/thank-you`, 
+      cancel_url: `${frontendUrl}/checkout-cancelled`,
     });
 
     res.status(200).json({ url: session.url });
@@ -74,6 +74,13 @@ exports.handlePaymentSuccess = async (req, res) => {
       if (!booking) {
         return res.status(404).json({ message: 'Booking not found.' });
       }
+
+      // Prepare email details
+      const emailSubject = 'Payment Confirmation';
+      const emailText = `Thank you for your payment. Your payment details are: ${JSON.stringify(session)}`;
+
+      // Send confirmation email
+      await sendEmail(booking.user.email, emailSubject, emailText);
 
       console.log(`Payment succeeded for booking ID: ${booking._id}`);
       return res.status(200).json({ message: 'Payment processed successfully!' });
