@@ -32,7 +32,7 @@ exports.getPaymentById = async (req, res) => {
 // Handle Stripe checkout session creation
 exports.createCheckoutSession = async (req, res) => {
   try {
-    const frontendUrl = 'http://localhost:5173'; // Replace with your actual frontend URL
+    const frontendUrl = 'https://online-vehicle-rental.netlify.app'; // Replace with your actual frontend URL
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
