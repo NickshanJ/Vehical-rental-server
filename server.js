@@ -7,7 +7,7 @@ const path = require('path');
 
 // Import routes
 const vehicleRoutes = require('./routes/vehicleRoutes');
-const authRoutes = require('./routes/authRoutes'); // Ensure this path is correct
+const authRoutes = require('./routes/authRoutes');
 const bookingRoutes = require('./routes/bookingRoutes');
 const userRoutes = require('./routes/userRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
@@ -47,7 +47,7 @@ mongoose
 
 // Routes
 app.get('/', (req, res) => res.send('API Running'));
-app.use('/api/auth', authRoutes); // Ensure this route is correct
+app.use('/api/auth', authRoutes);
 app.use('/api/vehicles', vehicleRoutes);
 app.use('/api/booking', bookingRoutes);
 app.use('/api/users', userRoutes);

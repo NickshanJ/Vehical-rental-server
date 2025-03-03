@@ -145,6 +145,9 @@ const getProfile = async (req, res) => {
 // Update user profile
 const updateUserProfile = async (req, res) => {
   try {
+    console.log('Request body:', req.body);
+    console.log('Request file:', req.file);
+    
     const user = await User.findById(req.user._id);
 
     if (!user) {
@@ -159,7 +162,7 @@ const updateUserProfile = async (req, res) => {
     }
 
     if (req.file) {
-      console.log('Uploaded file:', req.file);
+      console.log('Uploaded file:', req.file); 
       user.imageUrl = req.file.path;
     }
 
@@ -173,6 +176,7 @@ const updateUserProfile = async (req, res) => {
       imageUrl: updatedUser.imageUrl
     });
   } catch (error) {
+    console.error('Error in updateProfile:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
