@@ -1,5 +1,6 @@
 const Review = require('../models/Review');
 const User = require('../models/User');
+const Vehicle = require('../models/Vehicle');
 
 // Add review
 exports.addReview = async (req, res) => {
@@ -18,6 +19,9 @@ exports.addReview = async (req, res) => {
 
     // Add review to user's reviews array
     await User.findByIdAndUpdate(userId, { $push: { reviews: review._id } });
+
+    // Add review to vehicle's reviews array (optional, but recommended)
+    await Vehicle.findByIdAndUpdate(vehicle, { $push: { reviews: review._id } });
 
     res.status(201).json(review);
   } catch (error) {
