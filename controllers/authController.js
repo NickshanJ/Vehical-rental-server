@@ -159,10 +159,13 @@ const updateUserProfile = async (req, res) => {
     }
 
     if (req.file) {
+      console.log('Uploaded file:', req.file);
       user.imageUrl = req.file.path;
     }
 
     const updatedUser = await user.save();
+    console.log('Updated user:', updatedUser);
+
     res.status(200).json({
       _id: updatedUser._id,
       username: updatedUser.username,
