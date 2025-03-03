@@ -34,6 +34,9 @@ const paymentConfirmation = async (req, res) => {
     await booking.save();
     console.log('Booking saved:', booking);
 
+    // Add booking to user's bookings array
+    await User.findByIdAndUpdate(userId, { $push: { bookings: booking._id } });
+
     // Update rental history
     const rentalHistory = new RentalHistory({
       user: userId,
