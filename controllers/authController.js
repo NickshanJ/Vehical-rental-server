@@ -142,22 +142,10 @@ const getProfile = async (req, res) => {
   }
 };
 
-// Set up multer for file uploads
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/');
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname));
-  }
-});
-
-const upload = multer({ storage: storage });
-
 // Update user profile
 const updateUserProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.user.userId);
+    const user = await User.findById(req.user._id);
 
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
@@ -171,11 +159,16 @@ const updateUserProfile = async (req, res) => {
     }
 
     if (req.file) {
-      user.imageUrl = req.file.path; // Save the file path in the database
+      user.imageUrl = req.file.path;
     }
 
     const updatedUser = await user.save();
-    res.status(200).json(updatedUser);
+    res.status(200).json({
+      _id: updatedUser._id,
+      username: updatedUser.username,
+      email: updatedUser.email,
+      imageUrl: updatedUser.imageUrl
+    });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
