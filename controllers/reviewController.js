@@ -1,16 +1,24 @@
 const Review = require('../models/Review');
+const User = require('../models/User');
 
 // Add review
 exports.addReview = async (req, res) => {
   try {
     const { vehicle, rating, comment } = req.body;
+    const userId = req.user._id; // Ensure you have the user's ID
+
     const review = new Review({
-      user: req.user.userId,
+      user: userId,
       vehicle,
       rating,
       comment
     });
+
     await review.save();
+
+    // Add review to user's reviews array
+    await User.findByIdAndUpdate(userId, { $push: { reviews: review._id } });
+
     res.status(201).json(review);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });

@@ -4,6 +4,7 @@ dotenv.config(); // Load environment variables
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY); // Use the Stripe secret key from .env
 const Booking = require('../models/Booking');
 const RentalHistory = require('../models/RentalHistory');
+const User = require('../models/User');
 const sendEmail = require('../utils/emailService');
 const generateInvoice = require('../utils/invoiceService');
 const fs = require('fs');
