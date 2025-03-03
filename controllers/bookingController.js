@@ -24,9 +24,6 @@ const paymentConfirmation = async (req, res) => {
 
     const { vehicle, startDate, endDate, totalAmount, userId } = paymentIntent.metadata;
 
-    console.log(`Retrieved payment intent: ${paymentIntent}`);
-    console.log(`Vehicle ID: ${vehicle}, Start Date: ${startDate}, End Date: ${endDate}, Total Amount: ${totalAmount}, User ID: ${userId}`);
-
     // Create and save the booking
     const booking = new Booking({
       user: userId,
@@ -39,8 +36,8 @@ const paymentConfirmation = async (req, res) => {
     console.log('Booking saved:', booking);
 
     // Add booking to user's bookings array
-    const userUpdateResult = await User.findByIdAndUpdate(userId, { $push: { bookings: booking._id } });
-    console.log(`User updated with new booking: ${userUpdateResult}`);
+    await User.findByIdAndUpdate(userId, { $push: { bookings: booking._id } });
+    console.log(`Booking ID ${booking._id} added to user ${userId}`);
 
     // Update rental history
     const rentalHistory = new RentalHistory({

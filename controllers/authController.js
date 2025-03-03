@@ -120,6 +120,10 @@ const getProfile = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
+    // Fetch bookings directly if not present in user's bookings array
+    const additionalBookings = await Booking.find({ user: req.user._id }).populate('vehicle', 'model');
+    user.bookings = user.bookings.concat(additionalBookings.filter(booking => !user.bookings.includes(booking._id)));
+    
     console.log('Populated bookings:', user.bookings);
     console.log('Populated reviews:', user.reviews);
 
