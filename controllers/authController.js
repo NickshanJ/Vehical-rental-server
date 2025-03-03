@@ -105,15 +105,14 @@ const getProfile = async (req, res) => {
   try {
     console.log('Fetching user profile for user ID:', req.user._id);
 
-    // Populate bookings and reviews
     const user = await User.findById(req.user._id)
       .populate({
         path: 'bookings',
-        populate: { path: 'vehicle', select: 'model' } // Ensure vehicle model is populated
+        populate: { path: 'vehicle', select: 'model' }
       })
       .populate({
         path: 'reviews',
-        populate: { path: 'vehicle', select: 'model' } // Ensure vehicle model is populated
+        populate: { path: 'vehicle', select: 'model' }
       });
 
     if (!user) {
